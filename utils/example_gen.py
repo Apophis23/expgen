@@ -40,22 +40,20 @@ def select_true_example(model, num_labels, data_frame, data_loader, tokenizer, d
         batch_start_idx += len(labels)
 
     for i in range(num_labels):
-        # logit 값에 따라 정렬
         correct_predictions[i].sort(key=lambda x: x[0], reverse=True)
-        # 정렬된 데이터를 분리하여 저장
         sorted_class_data = [pred[1] for pred in correct_predictions[i]]
         sorted_input_embeds = [pred[2] for pred in correct_predictions[i]]
         sorted_output_embeds = [pred[3] for pred in correct_predictions[i]]
-        sorted_attn_masks = [pred[4] for pred in correct_predictions[i]]  # Attention mask 정렬
+        sorted_attn_masks = [pred[4] for pred in correct_predictions[i]]
 
         class_df = pd.DataFrame(sorted_class_data)
         class_dfs.append(class_df)
 
         sorted_input_embeddings.append(sorted_input_embeds)
         sorted_output_embeddings.append(sorted_output_embeds)
-        sorted_attention_masks.append(sorted_attn_masks)  # Attention mask 저장
+        sorted_attention_masks.append(sorted_attn_masks)
 
-    return sorted_input_embeddings, sorted_attention_masks  # Attention mask도 반환
+    return sorted_input_embeddings, sorted_attention_masks
 
 
 def extract_top_n_embeddings(extract_num, class_num, embeds_list, attn_masks_list):
@@ -72,12 +70,10 @@ def extract_top_n_embeddings(extract_num, class_num, embeds_list, attn_masks_lis
             class_embeds_tensor = torch.tensor(class_embeds)
             extracted_embeds.append(class_embeds_tensor)
 
-            # 어텐션 마스크 추출
             class_attn_mask = np.array(attn_masks_list[j][i:i + 1])
             class_attn_mask_tensor = torch.tensor(class_attn_mask)
             extracted_masks.append(class_attn_mask_tensor)
 
-        # 임베딩과 어텐션 마스크를 각각의 리스트에 추가
         return_embeds_list.append(extracted_embeds)
         return_masks_list.append(extracted_masks)
 
@@ -98,12 +94,10 @@ def extract_bottom_n_embeddings(extract_num, class_num, embeds_list, attn_masks_
             class_embeds_tensor = torch.tensor(class_embeds)
             extracted_embeds.append(class_embeds_tensor)
 
-            # 어텐션 마스크 추출
             class_attn_mask = np.array(attn_masks_list[j][-(i + 1):-(i)] or attn_masks_list[j][-(i + 1):])
             class_attn_mask_tensor = torch.tensor(class_attn_mask)
             extracted_masks.append(class_attn_mask_tensor)
 
-        # 임베딩과 어텐션 마스크를 각각의 리스트에 추가
         return_embeds_list.append(extracted_embeds)
         return_masks_list.append(extracted_masks)
 

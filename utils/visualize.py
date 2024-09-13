@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from utils.example_gen import *
+import gc
 
 def ret_classification_report(model, emb_list, label_list, device):
     predictions = []
@@ -43,7 +44,6 @@ def extract_cls_token(model, embedding_list, attn_masks_list, device):
 def select_random_samples(token_list, num_samples=10):
     return random.sample(token_list, num_samples)
 
-# TSNE 시각화 및 저장
 def visualize_embeddings_TSNE(original_cls_token_list, predict_token_list, class_num, result_dir, file_name, random_state=42):
     tsne = TSNE(n_components=2, random_state=random_state)
     reduced_embeddings = tsne.fit_transform(original_cls_token_list)
@@ -59,11 +59,9 @@ def visualize_embeddings_TSNE(original_cls_token_list, predict_token_list, class
     plt.xlabel("Dimension 1")
     plt.ylabel("Dimension 2")
 
-    # 저장
     plt.savefig(f"{result_dir}/tsne_{file_name}.png")  # 전달받은 result_dir 사용
     plt.show()
 
-# PCA 시각화 및 저장
 def visualize_embeddings_PCA(original_cls_token_list, predict_token_list, class_num, result_dir, file_name):
     pca = PCA(n_components=2)
     reduced_embeddings = pca.fit_transform(original_cls_token_list)
@@ -79,7 +77,6 @@ def visualize_embeddings_PCA(original_cls_token_list, predict_token_list, class_
     plt.xlabel("Principal Component 1")
     plt.ylabel("Principal Component 2")
 
-    # 저장
     plt.savefig(f"{result_dir}/pca-{file_name}.png")  # 전달받은 result_dir 사용
     plt.show()
 
@@ -98,6 +95,9 @@ def save_result(model, extract_num, p_list, n_list, p_attn, n_attn, df, class_nu
         for j in range(10):
             exp.append(plot_list[i][j])
             msk.append(plot_mask[i][j])
+
+    del plot_list, plot_mask
+    gc.collect()
 
     cls_list, preds_list = extract_cls_token(model, exp, msk, device)
     visualize_embeddings_TSNE(cls_list, preds_list, 10, result_dir, "original_data", random_state=42)  # result_dir 전달
