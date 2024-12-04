@@ -1,0 +1,6 @@
+.bert-4_128-imdb/
+.bert-4_128-yahoo/
+*.zip
+*.png
+.result/
+.ipynb_checkpoints/
